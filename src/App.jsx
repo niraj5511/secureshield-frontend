@@ -86,11 +86,11 @@ const AppContent = () => {
 function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <GuestProvider>
+      <GuestProvider>
+        <AuthProvider>
           <AppContent />
-        </GuestProvider>
-      </AuthProvider>
+        </AuthProvider>
+      </GuestProvider>
     </ThemeProvider>
   );
 }

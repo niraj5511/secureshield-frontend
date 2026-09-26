@@ -8,6 +8,7 @@ import {
   isAuthenticated,
 } from "../services/api";
 import toast from "react-hot-toast";
+import { useGuest } from "./GuestContext";
 
 const AuthContext = createContext();
 
@@ -20,6 +21,7 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
+  const { clearScans } = useGuest();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticatedState, setIsAuthenticatedState] = useState(false);
@@ -75,6 +77,7 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setUser(null);
       setIsAuthenticatedState(false);
+      clearScans();
       toast.success("Logged out successfully");
     }
   };
