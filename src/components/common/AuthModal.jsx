@@ -43,8 +43,8 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login", onSuccess }) => {
     e.preventDefault();
 
     if (mode === "register") {
-      if (password.length < 6) {
-        toast.error("Password must be at least 6 characters");
+      if (password.length < 8) {
+        toast.error("Password must be at least 8 characters");
         return;
       }
       if (password !== confirmPassword) {
@@ -373,7 +373,7 @@ const AuthModal = ({ isOpen, onClose, initialMode = "login", onSuccess }) => {
               <p
                 style={{ fontSize: "12px", color: "#94a3b8", marginTop: "4px" }}
               >
-                Minimum 6 characters
+                Minimum 8 characters
               </p>
             )}
           </div>
