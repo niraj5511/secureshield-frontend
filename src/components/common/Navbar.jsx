@@ -13,37 +13,44 @@ import {
   FaSignOutAlt,
   FaUserPlus,
   FaSignInAlt,
+  FaChevronDown,
 } from "react-icons/fa";
 import ThemeToggle from "./ThemeToggle";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
 import AuthModal from "./AuthModal";
 
+const navItems = [
+  { path: "/", label: "Dashboard", icon: FaHome },
+  { path: "/url-scan", label: "URL Scanner", icon: FaGlobe },
+  { path: "/message-scan", label: "Message Scanner", icon: FaEnvelope },
+  { path: "/history", label: "History", icon: FaHistory },
+];
+
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const { isDark } = useTheme();
   const { isAuthenticated, user, logout } = useAuth();
+
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState("login");
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 8);
+    handleScroll();
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navItems = [
-    { path: "/", label: "Dashboard", icon: FaHome },
-    { path: "/url-scan", label: "URL Scanner", icon: FaGlobe },
-    { path: "/message-scan", label: "Message Scanner", icon: FaEnvelope },
-    { path: "/history", label: "History", icon: FaHistory },
-  ];
+  // Close menus when the route changes
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+    setShowUserMenu(false);
+  }, [location.pathname]);
 
   const isActive = (path) => location.pathname === path;
 
@@ -58,6 +65,7 @@ const Navbar = () => {
     await logout();
     navigate("/");
     setShowUserMenu(false);
+    setIsMobileMenuOpen(false);
   };
 
   const handleAuthSuccess = () => {
@@ -65,529 +73,452 @@ const Navbar = () => {
     window.location.reload();
   };
 
-  const themeColors = {
-    background: isDark ? "#0f172a" : "rgba(255, 255, 255, 0.98)",
-    backgroundScrolled: isDark
-      ? "rgba(15, 23, 42, 0.98)"
-      : "rgba(255, 255, 255, 0.98)",
-    backgroundMobile: isDark ? "#1e293b" : "white",
-    text: isDark ? "#f1f5f9" : "#475569",
-    textActive: isDark ? "#93c5fd" : "#667eea",
-    textInactive: isDark ? "#94a3b8" : "#475569",
-    border: isDark ? "#334155" : "#e2e8f0",
-    hoverBg: isDark ? "#334155" : "#f1f5f9",
-    shadow: isDark
-      ? "0 4px 20px rgba(0, 0, 0, 0.4)"
-      : "0 4px 20px rgba(0, 0, 0, 0.1)",
-  };
+  const initial = user?.firstName ? user.firstName.charAt(0).toUpperCase() : "U";
+
+  // Colour tokens for this component (light / dark)
+  const vars = isDark
+    ? {
+        "--nav-bg": "rgba(11, 18, 32, 0.85)",
+        "--nav-border": "#1e293b",
+        "--nav-text": "#e2e8f0",
+        "--nav-muted": "#94a3b8",
+        "--nav-hover": "rgba(148, 163, 184, 0.12)",
+        "--nav-active-bg": "rgba(59, 130, 246, 0.16)",
+        "--nav-active-text": "#93c5fd",
+        "--nav-menu-bg": "#111a2e",
+        "--nav-shadow": "0 8px 30px rgba(0, 0, 0, 0.45)",
+        "--nav-danger-hover": "rgba(239, 68, 68, 0.12)",
+      }
+    : {
+        "--nav-bg": "rgba(255, 255, 255, 0.85)",
+        "--nav-border": "#e2e8f0",
+        "--nav-text": "#0b1220",
+        "--nav-muted": "#64748b",
+        "--nav-hover": "#f1f5f9",
+        "--nav-active-bg": "#eff6ff",
+        "--nav-active-text": "#1d4ed8",
+        "--nav-menu-bg": "#ffffff",
+        "--nav-shadow": "0 8px 30px rgba(11, 18, 32, 0.12)",
+        "--nav-danger-hover": "#fef2f2",
+      };
 
   return (
     <>
       <nav
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 1000,
-          background: scrolled
-            ? themeColors.backgroundScrolled
-            : themeColors.background,
-          backdropFilter: "blur(20px)",
-          boxShadow: scrolled ? themeColors.shadow : "none",
-          transition: "all 0.3s ease",
-          borderBottom: `1px solid ${themeColors.border}`,
-        }}
+        className={`ss-nav ${scrolled ? "ss-nav--scrolled" : ""}`}
+        style={vars}
       >
-        <div
-          style={{
-            maxWidth: "1400px",
-            margin: "0 auto",
-            padding: "12px 24px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
+        <div className="ss-nav__inner">
           {/* Logo */}
-          <Link
-            to="/"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              textDecoration: "none",
-            }}
-          >
-            <div
-              style={{
-                width: "40px",
-                height: "40px",
-                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                borderRadius: "12px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                boxShadow: "0 4px 15px rgba(102, 126, 234, 0.3)",
-              }}
-            >
-              <FaShieldAlt style={{ color: "white", fontSize: "20px" }} />
-            </div>
-            <div>
-              <span
-                style={{
-                  fontSize: "20px",
-                  fontWeight: "800",
-                  background:
-                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                  WebkitBackgroundClip: "text",
-                  backgroundClip: "text",
-                  color: "transparent",
-                }}
-              >
-                SecureShield
+          <Link to="/" className="ss-nav__logo">
+            <span className="ss-nav__logo-mark">
+              <FaShieldAlt size={18} />
+            </span>
+            <span className="ss-nav__logo-text">
+              <span className="ss-nav__brand">
+                Secure<span>Shield</span>
               </span>
-              <span
-                style={{
-                  fontSize: "10px",
-                  display: "block",
-                  color: isDark ? "#94a3b8" : "#64748b",
-                  letterSpacing: "0.5px",
-                }}
-              >
+              <span className="ss-nav__tagline">
                 {isAuthenticated
                   ? `Welcome, ${user?.firstName || "User"}`
-                  : "AI Security"}
+                  : "AI Phishing Detection"}
               </span>
-            </div>
+            </span>
           </Link>
 
-          {/* Desktop Menu */}
-          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          {/* Desktop links */}
+          <div className="ss-nav__links">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  padding: "10px 20px",
-                  borderRadius: "12px",
-                  textDecoration: "none",
-                  color: isActive(item.path)
-                    ? "white"
-                    : themeColors.textInactive,
-                  background: isActive(item.path)
-                    ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-                    : "transparent",
-                  fontWeight: "500",
-                  transition: "all 0.3s ease",
-                  position: "relative",
-                  overflow: "hidden",
-                }}
-                onMouseEnter={(e) => {
-                  if (!isActive(item.path)) {
-                    e.currentTarget.style.background = themeColors.hoverBg;
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isActive(item.path)) {
-                    e.currentTarget.style.background = "transparent";
-                  }
-                }}
+                className={`ss-nav__link ${
+                  isActive(item.path) ? "ss-nav__link--active" : ""
+                }`}
               >
-                <item.icon size={18} />
+                <item.icon size={15} />
                 <span>{item.label}</span>
               </Link>
             ))}
+          </div>
 
+          {/* Desktop actions */}
+          <div className="ss-nav__actions">
             <ThemeToggle />
 
             {isAuthenticated ? (
               <div style={{ position: "relative" }}>
                 <button
+                  className="ss-nav__user"
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    padding: "8px 16px",
-                    background: "transparent",
-                    border: `1px solid ${themeColors.border}`,
-                    borderRadius: "12px",
-                    cursor: "pointer",
-                    color: themeColors.text,
-                    transition: "all 0.3s ease",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.background = themeColors.hoverBg)
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.background = "transparent")
-                  }
                 >
-                  <div
-                    style={{
-                      width: "32px",
-                      height: "32px",
-                      borderRadius: "50%",
-                      background:
-                        "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "white",
-                      fontWeight: "bold",
-                      fontSize: "14px",
-                    }}
-                  >
-                    {user?.firstName
-                      ? user.firstName.charAt(0).toUpperCase()
-                      : "U"}
-                  </div>
-                  <span style={{ fontSize: "14px", fontWeight: "500" }}>
+                  <span className="ss-nav__avatar">{initial}</span>
+                  <span className="ss-nav__user-name">
                     {user?.firstName || "User"}
                   </span>
+                  <FaChevronDown
+                    size={10}
+                    style={{
+                      transition: "transform 0.2s ease",
+                      transform: showUserMenu ? "rotate(180deg)" : "none",
+                    }}
+                  />
                 </button>
 
                 {showUserMenu && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "calc(100% + 8px)",
-                      right: 0,
-                      background: themeColors.backgroundMobile,
-                      borderRadius: "16px",
-                      boxShadow: `0 20px 60px ${themeColors.shadow}`,
-                      border: `1px solid ${themeColors.border}`,
-                      padding: "8px",
-                      minWidth: "200px",
-                      zIndex: 1000,
-                    }}
-                  >
+                  <div className="ss-nav__dropdown">
                     <Link
                       to="/profile"
+                      className="ss-nav__dropdown-item"
                       onClick={() => setShowUserMenu(false)}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "12px",
-                        padding: "10px 14px",
-                        borderRadius: "10px",
-                        textDecoration: "none",
-                        color: themeColors.text,
-                        transition: "all 0.2s ease",
-                      }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.background = themeColors.hoverBg)
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.background = "transparent")
-                      }
                     >
-                      <FaUser size={16} />
+                      <FaUser size={14} />
                       <span>Profile</span>
                     </Link>
                     <button
+                      className="ss-nav__dropdown-item ss-nav__dropdown-item--danger"
                       onClick={handleLogout}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "12px",
-                        padding: "10px 14px",
-                        width: "100%",
-                        borderRadius: "10px",
-                        border: "none",
-                        background: "transparent",
-                        color: "#ef4444",
-                        cursor: "pointer",
-                        transition: "all 0.2s ease",
-                      }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.background = "#fef2f2")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.background = "transparent")
-                      }
                     >
-                      <FaSignOutAlt size={16} />
+                      <FaSignOutAlt size={14} />
                       <span>Logout</span>
                     </button>
                   </div>
                 )}
               </div>
             ) : (
-              <div style={{ display: "flex", gap: "8px" }}>
+              <>
                 <button
+                  className="ss-nav__btn ss-nav__btn--ghost"
                   onClick={() => handleAuthClick("login")}
-                  style={{
-                    padding: "10px 20px",
-                    background: "transparent",
-                    border: `1px solid ${themeColors.border}`,
-                    borderRadius: "12px",
-                    cursor: "pointer",
-                    color: themeColors.text,
-                    fontWeight: "500",
-                    transition: "all 0.3s ease",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.background = themeColors.hoverBg)
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.background = "transparent")
-                  }
                 >
-                  <FaSignInAlt size={16} />
+                  <FaSignInAlt size={14} />
                   <span>Login</span>
                 </button>
                 <button
+                  className="ss-nav__btn ss-nav__btn--primary"
                   onClick={() => handleAuthClick("register")}
-                  style={{
-                    padding: "10px 20px",
-                    background:
-                      "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                    border: "none",
-                    borderRadius: "12px",
-                    cursor: "pointer",
-                    color: "white",
-                    fontWeight: "500",
-                    transition: "all 0.3s ease",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = "scale(1.02)";
-                    e.currentTarget.style.boxShadow =
-                      "0 4px 15px rgba(102,126,234,0.4)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "scale(1)";
-                    e.currentTarget.style.boxShadow = "none";
-                  }}
                 >
-                  <FaUserPlus size={16} />
+                  <FaUserPlus size={14} />
                   <span>Register</span>
                 </button>
-              </div>
+              </>
             )}
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile toggle */}
           <button
+            className="ss-nav__burger"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            style={{
-              display: "none",
-              background: "none",
-              border: "none",
-              fontSize: "24px",
-              cursor: "pointer",
-              color: themeColors.text,
-              padding: "8px",
-            }}
-            className="mobile-menu-btn"
+            aria-label="Toggle menu"
           >
-            {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
+            {isMobileMenuOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
           </button>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile menu */}
         {isMobileMenuOpen && (
-          <div
-            style={{
-              padding: "20px",
-              background: themeColors.backgroundMobile,
-              borderTop: `1px solid ${themeColors.border}`,
-              display: "none",
-            }}
-            className="mobile-menu"
-          >
+          <div className="ss-nav__mobile">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                onClick={() => setIsMobileMenuOpen(false)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                  padding: "12px",
-                  borderRadius: "12px",
-                  textDecoration: "none",
-                  color: isActive(item.path)
-                    ? themeColors.textActive
-                    : themeColors.text,
-                  background: isActive(item.path)
-                    ? themeColors.hoverBg
-                    : "transparent",
-                  fontWeight: "500",
-                  marginBottom: "8px",
-                }}
+                className={`ss-nav__link ${
+                  isActive(item.path) ? "ss-nav__link--active" : ""
+                }`}
               >
-                <item.icon size={18} />
+                <item.icon size={16} />
                 <span>{item.label}</span>
               </Link>
             ))}
 
-            <div
-              style={{
-                marginTop: "12px",
-                paddingTop: "12px",
-                borderTop: `1px solid ${themeColors.border}`,
-              }}
-            >
+            <div className="ss-nav__mobile-section">
               {isAuthenticated ? (
                 <>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "12px",
-                      padding: "12px",
-                      borderRadius: "12px",
-                      background: themeColors.hoverBg,
-                      marginBottom: "8px",
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: "36px",
-                        height: "36px",
-                        borderRadius: "50%",
-                        background:
-                          "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        color: "white",
-                        fontWeight: "bold",
-                        fontSize: "16px",
-                      }}
-                    >
-                      {user?.firstName
-                        ? user.firstName.charAt(0).toUpperCase()
-                        : "U"}
-                    </div>
-                    <div>
-                      <div
-                        style={{ fontWeight: "600", color: themeColors.text }}
-                      >
+                  <div className="ss-nav__mobile-user">
+                    <span className="ss-nav__avatar ss-nav__avatar--lg">
+                      {initial}
+                    </span>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontWeight: 700, color: "var(--nav-text)" }}>
                         {user?.firstName} {user?.lastName || ""}
                       </div>
                       <div
                         style={{
-                          fontSize: "12px",
-                          color: themeColors.textInactive,
+                          fontSize: 12,
+                          color: "var(--nav-muted)",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
                         }}
                       >
                         {user?.email || ""}
                       </div>
                     </div>
                   </div>
-                  <Link
-                    to="/profile"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "12px",
-                      padding: "12px",
-                      borderRadius: "12px",
-                      textDecoration: "none",
-                      color: themeColors.text,
-                      marginBottom: "8px",
-                    }}
-                  >
-                    <FaUser size={16} />
+                  <Link to="/profile" className="ss-nav__link">
+                    <FaUser size={15} />
                     <span>Profile</span>
                   </Link>
                   <button
+                    className="ss-nav__link ss-nav__link--danger"
                     onClick={handleLogout}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "12px",
-                      padding: "12px",
-                      width: "100%",
-                      borderRadius: "12px",
-                      border: "none",
-                      background: "transparent",
-                      color: "#ef4444",
-                      cursor: "pointer",
-                      textAlign: "left",
-                    }}
                   >
-                    <FaSignOutAlt size={16} />
+                    <FaSignOutAlt size={15} />
                     <span>Logout</span>
                   </button>
                 </>
               ) : (
                 <>
                   <button
+                    className="ss-nav__btn ss-nav__btn--ghost ss-nav__btn--block"
                     onClick={() => handleAuthClick("login")}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "12px",
-                      padding: "12px",
-                      width: "100%",
-                      borderRadius: "12px",
-                      border: "none",
-                      background: "transparent",
-                      color: themeColors.text,
-                      cursor: "pointer",
-                      marginBottom: "8px",
-                    }}
                   >
-                    <FaSignInAlt size={16} />
+                    <FaSignInAlt size={14} />
                     <span>Login</span>
                   </button>
                   <button
+                    className="ss-nav__btn ss-nav__btn--primary ss-nav__btn--block"
                     onClick={() => handleAuthClick("register")}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "12px",
-                      padding: "12px",
-                      width: "100%",
-                      borderRadius: "12px",
-                      border: "none",
-                      background:
-                        "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                      color: "white",
-                      cursor: "pointer",
-                      fontWeight: "500",
-                    }}
                   >
-                    <FaUserPlus size={16} />
+                    <FaUserPlus size={14} />
                     <span>Create Account</span>
                   </button>
                 </>
               )}
             </div>
 
-            <div
-              style={{
-                marginTop: "12px",
-                paddingTop: "12px",
-                borderTop: `1px solid ${themeColors.border}`,
-              }}
-            >
+            <div className="ss-nav__mobile-section">
               <ThemeToggle />
             </div>
           </div>
         )}
 
         <style>{`
-          @media (max-width: 768px) {
-            .mobile-menu-btn {
-              display: block !important;
-            }
-            .mobile-menu {
-              display: block !important;
-            }
+          .ss-nav {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: var(--nav-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--nav-border);
+            transition: box-shadow 0.25s ease;
+          }
+          .ss-nav--scrolled { box-shadow: var(--nav-shadow); }
+
+          .ss-nav__inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 10px 24px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+          }
+
+          /* Logo */
+          .ss-nav__logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            flex-shrink: 0;
+          }
+          .ss-nav__logo-mark {
+            width: 38px;
+            height: 38px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+          }
+          .ss-nav__logo-text { display: flex; flex-direction: column; line-height: 1.15; }
+          .ss-nav__brand {
+            font-size: 19px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--nav-text);
+          }
+          .ss-nav__brand span { color: #2563eb; }
+          .ss-nav__tagline {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--nav-muted);
+          }
+
+          /* Links */
+          .ss-nav__links {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin: 0 auto;
+          }
+          .ss-nav__link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 14px;
+            border-radius: 10px;
+            border: none;
+            background: transparent;
+            color: var(--nav-muted);
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.2s ease, color 0.2s ease;
+          }
+          .ss-nav__link:hover { background: var(--nav-hover); color: var(--nav-text); }
+          .ss-nav__link--active,
+          .ss-nav__link--active:hover {
+            background: var(--nav-active-bg);
+            color: var(--nav-active-text);
+          }
+          .ss-nav__link--danger { color: #ef4444; width: 100%; }
+          .ss-nav__link--danger:hover { background: var(--nav-danger-hover); color: #ef4444; }
+
+          /* Actions */
+          .ss-nav__actions { display: flex; align-items: center; gap: 8px; }
+
+          .ss-nav__btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 9px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+          }
+          .ss-nav__btn--ghost {
+            background: transparent;
+            border: 1px solid var(--nav-border);
+            color: var(--nav-text);
+          }
+          .ss-nav__btn--ghost:hover { background: var(--nav-hover); }
+          .ss-nav__btn--primary {
+            border: 1px solid transparent;
+            color: #fff;
+            background: #2563eb;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+          }
+          .ss-nav__btn--primary:hover {
+            background: #1d4ed8;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+          }
+          .ss-nav__btn--block { width: 100%; padding: 12px; }
+
+          /* User menu */
+          .ss-nav__user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 12px 5px 5px;
+            border-radius: 999px;
+            border: 1px solid var(--nav-border);
+            background: transparent;
+            color: var(--nav-text);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease;
+          }
+          .ss-nav__user:hover { background: var(--nav-hover); }
+          .ss-nav__avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+          }
+          .ss-nav__avatar--lg { width: 38px; height: 38px; font-size: 16px; flex-shrink: 0; }
+
+          .ss-nav__dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            min-width: 190px;
+            padding: 6px;
+            border-radius: 14px;
+            background: var(--nav-menu-bg);
+            border: 1px solid var(--nav-border);
+            box-shadow: var(--nav-shadow);
+          }
+          .ss-nav__dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 9px;
+            border: none;
+            background: transparent;
+            color: var(--nav-text);
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.15s ease;
+          }
+          .ss-nav__dropdown-item:hover { background: var(--nav-hover); }
+          .ss-nav__dropdown-item--danger { color: #ef4444; }
+          .ss-nav__dropdown-item--danger:hover { background: var(--nav-danger-hover); }
+
+          /* Mobile */
+          .ss-nav__burger {
+            display: none;
+            margin-left: auto;
+            padding: 8px;
+            border: none;
+            border-radius: 10px;
+            background: transparent;
+            color: var(--nav-text);
+            cursor: pointer;
+          }
+          .ss-nav__burger:hover { background: var(--nav-hover); }
+          .ss-nav__mobile {
+            display: none;
+            padding: 12px 16px 20px;
+            background: var(--nav-menu-bg);
+            border-top: 1px solid var(--nav-border);
+          }
+          .ss-nav__mobile .ss-nav__link { padding: 12px; font-size: 15px; }
+          .ss-nav__mobile-section {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--nav-border);
+          }
+          .ss-nav__mobile-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            background: var(--nav-hover);
+          }
+          .ss-nav__mobile-section .ss-nav__btn + .ss-nav__btn { margin-top: 8px; }
+
+          @media (max-width: 960px) {
+            .ss-nav__links,
+            .ss-nav__actions { display: none; }
+            .ss-nav__burger { display: block; }
+            .ss-nav__mobile { display: block; }
+            .ss-nav__inner { padding: 10px 16px; }
+          }
+          @media (max-width: 1100px) and (min-width: 961px) {
+            .ss-nav__user-name { display: none; }
+            .ss-nav__link { padding: 9px 10px; }
           }
         `}</style>
       </nav>
