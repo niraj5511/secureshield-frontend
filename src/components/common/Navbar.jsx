@@ -287,7 +287,7 @@ const Navbar = () => {
             </div>
 
             <div className="ss-nav__mobile-section">
-              <ThemeToggle />
+              <ThemeToggle variant="segmented" />
             </div>
           </div>
         )}
