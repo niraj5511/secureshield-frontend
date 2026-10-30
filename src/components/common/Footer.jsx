@@ -15,27 +15,29 @@ const Footer = () => {
 
   return (
     <>
-      <footer className="sleek-footer">
-        <div className="footer-glow" />
-        <div className="footer-container">
-          <div className="footer-content">
-            {/* Brand Logo & Name */}
-            <div className="footer-brand">
-              <div className="logo-box">
-                <FaShieldAlt />
+      <footer className="ss-footer">
+        <div className="ss-footer__inner">
+          <div className="ss-footer__brand">
+            <span className="ss-footer__mark">
+              <FaShieldAlt size={14} />
+            </span>
+            <div>
+              <div className="ss-footer__name">
+                Secure<span>Shield</span>
               </div>
-              <span className="brand-title">SecureShield</span>
+              <div className="ss-footer__tagline">
+                AI-powered phishing and scam detection
+              </div>
             </div>
+          </div>
 
-            {/* Made with Love & Copyright */}
-            <div className="footer-info">
-              <p className="love-text">
-                Crafted with <FaHeart className="heart-icon" /> by{" "}
-                <span className="team-name">Team SecureShield</span>
-              </p>
-              <span className="dot">•</span>
-              <p className="copyright">© {currentYear}</p>
-            </div>
+          <div className="ss-footer__meta">
+            <span>
+              Crafted with <FaHeart className="ss-footer__heart" /> by{" "}
+              <strong>Team SecureShield</strong>
+            </span>
+            <span className="ss-footer__dot">•</span>
+            <span>© {currentYear}</span>
           </div>
         </div>
       </footer>
@@ -43,161 +45,88 @@ const Footer = () => {
       {showScrollTop && (
         <button
           onClick={scrollToTop}
-          className="scroll-top"
+          className="ss-scroll-top"
           aria-label="Scroll to top"
         >
-          <FaArrowUp />
+          <FaArrowUp size={13} />
         </button>
       )}
 
       <style>{`
-        .sleek-footer {
-          background: linear-gradient(180deg, #090d16 0%, #05080e 100%);
-          color: #94a3b8;
-          border-top: 1px solid rgba(99, 102, 241, 0.15);
-          font-family: system-ui, -apple-system, sans-serif;
+        .ss-footer {
           width: 100%;
           margin-top: auto;
-          position: relative;
-          overflow: hidden;
+          background: #0b1220;
+          border-top: 1px solid #1e293b;
+          color: #94a3b8;
         }
-
-        .footer-glow {
-          position: absolute;
-          top: 0;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 250px;
-          height: 40px;
-          background: linear-gradient(90deg, rgba(99, 102, 241, 0), rgba(99, 102, 241, 0.2), rgba(99, 102, 241, 0));
-          filter: blur(15px);
-          pointer-events: none;
-        }
-
-        .footer-container {
-          max-width: 1100px;
+        .ss-footer__inner {
+          max-width: 1400px;
           margin: 0 auto;
-          padding: 24px 20px;
-          position: relative;
-          z-index: 1;
-        }
-
-        .footer-content {
+          padding: 24px;
           display: flex;
           justify-content: space-between;
           align-items: center;
           flex-wrap: wrap;
           gap: 16px;
         }
-
-        .footer-brand {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-
-        .logo-box {
+        .ss-footer__brand { display: flex; align-items: center; gap: 12px; }
+        .ss-footer__mark {
           width: 34px;
           height: 34px;
-          background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-          border-radius: 8px;
+          border-radius: 10px;
           display: flex;
           align-items: center;
           justify-content: center;
           color: #fff;
-          font-size: 15px;
-          box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+          background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
         }
-
-        .brand-title {
+        .ss-footer__name {
           font-size: 15px;
-          font-weight: 700;
-          background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          letter-spacing: -0.3px;
+          font-weight: 800;
+          letter-spacing: -0.02em;
+          color: #f1f5f9;
         }
-
-        .footer-info {
+        .ss-footer__name span { color: #60a5fa; }
+        .ss-footer__tagline { font-size: 12px; color: #64748b; margin-top: 1px; }
+        .ss-footer__meta {
           display: flex;
           align-items: center;
           gap: 10px;
           font-size: 13px;
-        }
-
-        .footer-info p {
-          margin: 0;
-        }
-
-        .love-text {
-          display: flex;
-          align-items: center;
-          gap: 5px;
-          color: #94a3b8;
-        }
-
-        .team-name {
-          color: #cbd5e1;
-          font-weight: 500;
-        }
-
-        .heart-icon {
-          color: #f43f5e;
-          font-size: 11px;
-          animation: heartbeat 1.5s infinite ease-in-out;
-        }
-
-        .dot {
-          color: #475569;
-        }
-
-        .copyright {
           color: #64748b;
         }
+        .ss-footer__meta strong { color: #cbd5e1; font-weight: 600; }
+        .ss-footer__heart { color: #f43f5e; font-size: 11px; margin: 0 2px; }
+        .ss-footer__dot { color: #334155; }
 
-        .scroll-top {
+        .ss-scroll-top {
           position: fixed;
           bottom: 24px;
           right: 24px;
-          width: 38px;
-          height: 38px;
-          background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-          color: #fff;
+          width: 40px;
+          height: 40px;
           border: none;
-          border-radius: 50%;
-          cursor: pointer;
+          border-radius: 12px;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
-          transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          color: #fff;
+          background: #2563eb;
+          box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+          cursor: pointer;
           z-index: 1000;
-          font-size: 13px;
+          transition: transform 0.2s ease, background 0.2s ease;
         }
-
-        .scroll-top:hover {
-          transform: translateY(-3px) scale(1.05);
-          box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
-        }
-
-        @keyframes heartbeat {
-          0%, 100% { transform: scale(1); }
-          15% { transform: scale(1.2); }
-          30% { transform: scale(1); }
-          45% { transform: scale(1.2); }
-        }
+        .ss-scroll-top:hover { background: #1d4ed8; transform: translateY(-2px); }
 
         @media (max-width: 600px) {
-          .footer-content {
+          .ss-footer__inner {
             flex-direction: column;
             text-align: center;
-            justify-content: center;
-            gap: 12px;
+            padding: 20px 16px;
           }
-          .footer-info {
-            justify-content: center;
-            flex-wrap: wrap;
-          }
+          .ss-footer__meta { flex-wrap: wrap; justify-content: center; }
         }
       `}</style>
     </>
