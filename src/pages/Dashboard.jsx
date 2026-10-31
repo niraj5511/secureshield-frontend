@@ -393,35 +393,31 @@ const Dashboard = () => {
     </div>
   );
 
+  const axisColor = isDark ? "#94a3b8" : "#64748b";
+  const gridColor = isDark ? "#1e293b" : "#e2e8f0";
+  const sliceBorder = isDark ? "#111a2e" : "#ffffff";
+  const pieTotal =
+    stats.phishingDetected + stats.scamMessages + stats.safeDetections;
+
   const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div
-          style={{
-            background: "white",
-            padding: "12px 16px",
-            borderRadius: "12px",
-            boxShadow: "0 10px 40px rgba(0,0,0,0.15)",
-            border: "1px solid #e2e8f0",
-          }}
-        >
-          <p
-            style={{ fontWeight: "600", color: "#1e293b", marginBottom: "8px" }}
-          >
-            {label}
-          </p>
-          {payload.map((entry, index) => (
-            <p
-              key={index}
-              style={{ color: entry.color, fontSize: "14px", margin: "4px 0" }}
-            >
-              {entry.name}: {entry.value}
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
+    if (!active || !payload || !payload.length) return null;
+    return (
+      <div className="db-tooltip">
+        {label !== undefined && (
+          <div className="db-tooltip__label">{label}</div>
+        )}
+        {payload.map((entry, index) => (
+          <div key={index} className="db-tooltip__row">
+            <span
+              className="db-tooltip__dot"
+              style={{ background: entry.color || entry.payload?.color }}
+            />
+            <span>{entry.name}</span>
+            <strong>{entry.value}</strong>
+          </div>
+        ))}
+      </div>
+    );
   };
 
   const EmptyChartState = ({
@@ -431,75 +427,14 @@ const Dashboard = () => {
     actionText,
     onAction,
   }) => (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        height: "320px",
-        padding: "40px",
-        textAlign: "center",
-      }}
-    >
-      <div
-        style={{
-          width: "80px",
-          height: "80px",
-          borderRadius: "50%",
-          background: "linear-gradient(135deg, #667eea15 0%, #764ba215 100%)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          marginBottom: "20px",
-        }}
-      >
-        <Icon style={{ fontSize: "36px", color: "#94a3b8" }} />
+    <div className="db-empty">
+      <div className="db-empty__icon">
+        <Icon size={26} />
       </div>
-      <h3
-        style={{
-          fontSize: "18px",
-          fontWeight: "600",
-          color: "#1e293b",
-          marginBottom: "8px",
-        }}
-      >
-        {title}
-      </h3>
-      <p
-        style={{
-          fontSize: "14px",
-          color: "#94a3b8",
-          maxWidth: "300px",
-          marginBottom: "16px",
-        }}
-      >
-        {description}
-      </p>
+      <h3 className="db-empty__title">{title}</h3>
+      <p className="db-empty__text">{description}</p>
       {onAction && (
-        <button
-          onClick={onAction}
-          style={{
-            padding: "10px 24px",
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            color: "white",
-            border: "none",
-            borderRadius: "12px",
-            fontSize: "14px",
-            fontWeight: "600",
-            cursor: "pointer",
-            transition: "all 0.3s ease",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = "translateY(-2px) scale(1.02)";
-            e.currentTarget.style.boxShadow =
-              "0 8px 25px rgba(102,126,234,0.4)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = "translateY(0) scale(1)";
-            e.currentTarget.style.boxShadow = "none";
-          }}
-        >
+        <button className="db-empty__btn" onClick={onAction}>
           {actionText}
         </button>
       )}
@@ -621,32 +556,18 @@ const Dashboard = () => {
       </div>
 
       {/* Charts Row */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(450px, 1fr))",
-          gap: "24px",
-          marginBottom: "48px",
-        }}
-      >
+      <div className="db-charts">
         {/* Area Chart */}
-        <div className="chart-container" style={{ position: "relative" }}>
-          <div className="chart-title">
-            <FaChartLine style={{ color: "#667eea" }} />
-            <span>Detection Trends</span>
-            <span
-              style={{
-                fontSize: "12px",
-                fontWeight: "400",
-                color: "#94a3b8",
-                marginLeft: "8px",
-              }}
-            >
-              (Last 7 days)
+        <div className="db-card">
+          <div className="db-card__head">
+            <span className="db-card__icon">
+              <FaChartLine size={16} />
             </span>
+            <span className="db-card__title">Detection Trends</span>
+            <span className="db-card__hint">Last 7 days</span>
           </div>
           {hasWeeklyData ? (
-            <ResponsiveContainer width="100%" height={320}>
+            <ResponsiveContainer width="100%" height={300}>
               <AreaChart data={weeklyData}>
                 <defs>
                   <linearGradient
@@ -656,22 +577,50 @@ const Dashboard = () => {
                     x2="0"
                     y2="1"
                   >
-                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8} />
+                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
                     <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="colorScam" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.8} />
+                    <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
                     <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="colorSafe" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.8} />
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
                     <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="day" stroke="#64748b" fontSize={12} />
-                <YAxis stroke="#64748b" fontSize={12} />
-                <Tooltip content={<CustomTooltip />} />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke={gridColor}
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey="day"
+                  stroke={axisColor}
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  stroke={axisColor}
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                  allowDecimals={false}
+                />
+                <Tooltip
+                  content={<CustomTooltip />}
+                  cursor={{ stroke: gridColor }}
+                />
+                <Legend
+                  iconType="circle"
+                  iconSize={8}
+                  wrapperStyle={{
+                    fontSize: 13,
+                    color: axisColor,
+                    paddingTop: 8,
+                  }}
+                />
                 <Area
                   type="monotone"
                   dataKey="phishing"
@@ -701,7 +650,7 @@ const Dashboard = () => {
           ) : (
             <EmptyChartState
               icon={FaInbox}
-              title="No Scan Data Available"
+              title="No scan data yet"
               description="Start scanning URLs and messages to see detection trends over time."
               actionText="Start Scanning"
               onAction={() => navigate("/url-scan")}
@@ -709,72 +658,68 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* Pie Chart */}
-        <div className="chart-container" style={{ position: "relative" }}>
-          <div className="chart-title">
-            <FaChartPie style={{ color: "#667eea" }} />
-            <span>Threat Distribution</span>
-            <span
-              style={{
-                fontSize: "12px",
-                fontWeight: "400",
-                color: "#94a3b8",
-                marginLeft: "8px",
-              }}
-            >
-              ({totalThreats} threats)
+        {/* Donut Chart */}
+        <div className="db-card">
+          <div className="db-card__head">
+            <span className="db-card__icon">
+              <FaChartPie size={16} />
             </span>
+            <span className="db-card__title">Scan Results</span>
+            <span className="db-card__hint">{totalThreats} threats</span>
           </div>
-          {totalThreats > 0 ? (
-            <ResponsiveContainer width="100%" height={320}>
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={true}
-                  label={({ name, percent, value }) =>
-                    value > 0 ? `${name}: ${(percent * 100).toFixed(1)}%` : ""
-                  }
-                  outerRadius={100}
-                  innerRadius={50}
-                  fill="#8884d8"
-                  dataKey="value"
-                  paddingAngle={2}
-                >
-                  {pieData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={entry.color}
-                      stroke="white"
-                      strokeWidth={2}
+          {pieTotal > 0 ? (
+            <>
+              <div className="db-donut">
+                <ResponsiveContainer width="100%" height={220}>
+                  <PieChart>
+                    <Pie
+                      data={pieData.filter((d) => d.value > 0)}
+                      dataKey="value"
+                      nameKey="name"
+                      innerRadius={68}
+                      outerRadius={98}
+                      paddingAngle={3}
+                    >
+                      {pieData
+                        .filter((d) => d.value > 0)
+                        .map((entry) => (
+                          <Cell
+                            key={entry.name}
+                            fill={entry.color}
+                            stroke={sliceBorder}
+                            strokeWidth={3}
+                          />
+                        ))}
+                    </Pie>
+                    <Tooltip content={<CustomTooltip />} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="db-donut__center">
+                  <strong>{pieTotal}</strong>
+                  <span>scans</span>
+                </div>
+              </div>
+              <div className="db-legend">
+                {pieData.map((item) => (
+                  <div key={item.name} className="db-legend__row">
+                    <span
+                      className="db-legend__dot"
+                      style={{ background: item.color }}
                     />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    background: "white",
-                    border: "none",
-                    borderRadius: "12px",
-                    boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
-                    padding: "12px",
-                  }}
-                />
-                <Legend
-                  verticalAlign="bottom"
-                  height={36}
-                  formatter={(value, entry) => {
-                    const item = pieData.find((d) => d.name === value);
-                    return `${value}: ${item?.percentage || 0}%`;
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
+                    <span>{item.name}</span>
+                    <strong>{item.value}</strong>
+                    <span className="db-legend__pct">
+                      {pct(item.value, pieTotal).toFixed(1)}%
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </>
           ) : (
             <EmptyChartState
               icon={FaChartPie}
-              title="No Data to Display"
-              description="No scans have been performed yet. Start scanning to see threat distribution."
+              title="No results yet"
+              description="Run a scan to see how your results break down."
               actionText="Start Scanning"
               onAction={() => navigate("/message-scan")}
             />
