@@ -359,61 +359,35 @@ const Dashboard = () => {
     },
   ];
 
+  const pct = (part, whole) => (whole > 0 ? (part / whole) * 100 : 0);
+
   const StatCard = ({
     title,
     value,
     icon: Icon,
-    gradient,
-    trend,
+    tone = "blue",
     subtitle,
+    percent,
     locked,
   }) => (
-    <div
-      className="stat-card-premium"
-      style={{
-        position: "relative",
-        cursor: "default",
-        transition: "all 0.3s ease",
-      }}
-    >
-      {locked && !isAuthenticated && (
-        <div
-          style={{
-            position: "absolute",
-            top: "12px",
-            right: "12px",
-            background: "#f1f5f9",
-            padding: "4px 10px",
-            borderRadius: "8px",
-            fontSize: "10px",
-            fontWeight: "600",
-            color: "#64748b",
-            display: "flex",
-            alignItems: "center",
-            gap: "4px",
-          }}
-        >
-          <FaUserPlus size={10} />
-          <span>Sign in</span>
-        </div>
-      )}
-      <div className="stat-icon" style={{ background: gradient }}>
-        <Icon style={{ color: "white", fontSize: "28px" }} />
+    <div className={`db-stat db-stat--${tone}`}>
+      <div className="db-stat__top">
+        <span className="db-stat__icon">
+          <Icon size={18} />
+        </span>
+        <span className="db-stat__label">{title}</span>
+        {locked && !isAuthenticated && (
+          <span className="db-stat__lock">
+            <FaUserPlus size={9} />
+            Sign in
+          </span>
+        )}
       </div>
-      <div className="stat-value">{value}</div>
-      <div className="stat-label">{title}</div>
-      {subtitle && (
-        <div style={{ fontSize: "12px", color: "#94a3b8", marginTop: "4px" }}>
-          {subtitle}
-        </div>
-      )}
-      {trend !== undefined && trend !== null && (
-        <div
-          className="stat-trend"
-          style={{ color: trend >= 0 ? "#10b981" : "#ef4444" }}
-        >
-          {trend >= 0 ? <FaArrowUp size={12} /> : <FaArrowDown size={12} />}
-          <span>{Math.abs(trend)}% from last week</span>
+      <div className="db-stat__value">{value}</div>
+      {subtitle && <div className="db-stat__sub">{subtitle}</div>}
+      {percent !== undefined && (
+        <div className="db-stat__bar">
+          <span style={{ width: `${Math.min(percent, 100)}%` }} />
         </div>
       )}
     </div>
@@ -608,41 +582,40 @@ const Dashboard = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="stats-grid">
+      <div className="db-stats">
         <StatCard
           title="Total Scans"
           value={stats.totalScans}
           icon={FaShieldAlt}
-          gradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-          trend={hasData ? 12 : 0}
-          subtitle={isAuthenticated ? "All time scans" : "Session scans"}
+          tone="blue"
+          subtitle={isAuthenticated ? "All time" : "This session"}
           locked={!isAuthenticated}
         />
         <StatCard
           title="Phishing URLs"
           value={stats.phishingDetected}
           icon={FaExclamationTriangle}
-          gradient="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
-          trend={hasData ? -5 : 0}
-          subtitle={`${totalThreats > 0 ? ((stats.phishingDetected / totalThreats) * 100).toFixed(1) : 0}% of threats`}
+          tone="red"
+          percent={pct(stats.phishingDetected, totalThreats)}
+          subtitle={`${pct(stats.phishingDetected, totalThreats).toFixed(1)}% of threats`}
           locked={!isAuthenticated}
         />
         <StatCard
           title="Scam Messages"
           value={stats.scamMessages}
           icon={FaEnvelope}
-          gradient="linear-gradient(135deg, #fa709a 0%, #fee140 100%)"
-          trend={hasData ? 8 : 0}
-          subtitle={`${totalThreats > 0 ? ((stats.scamMessages / totalThreats) * 100).toFixed(1) : 0}% of threats`}
+          tone="amber"
+          percent={pct(stats.scamMessages, totalThreats)}
+          subtitle={`${pct(stats.scamMessages, totalThreats).toFixed(1)}% of threats`}
           locked={!isAuthenticated}
         />
         <StatCard
           title="Safe Detections"
           value={stats.safeDetections}
           icon={FaCheckCircle}
-          gradient="linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"
-          trend={hasData ? 15 : 0}
-          subtitle={`${stats.totalScans > 0 ? ((stats.safeDetections / stats.totalScans) * 100).toFixed(1) : 0}% of total`}
+          tone="green"
+          percent={pct(stats.safeDetections, stats.totalScans)}
+          subtitle={`${pct(stats.safeDetections, stats.totalScans).toFixed(1)}% of total`}
           locked={!isAuthenticated}
         />
       </div>
