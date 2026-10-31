@@ -729,257 +729,84 @@ const Dashboard = () => {
 
       {/* Guest Mode Call to Action */}
       {!isAuthenticated && hasData && (
-        <div
-          style={{
-            background: "linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)",
-            borderRadius: "24px",
-            padding: "32px 40px",
-            marginBottom: "48px",
-            textAlign: "center",
-            border: "1px solid #e2e8f0",
-          }}
-        >
-          <div
-            style={{
-              width: "64px",
-              height: "64px",
-              borderRadius: "50%",
-              background:
-                "linear-gradient(135deg, #667eea20 0%, #764ba220 100%)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              margin: "0 auto 16px",
-            }}
-          >
-            <FaUserPlus style={{ fontSize: "28px", color: "#667eea" }} />
+        <div className="db-banner">
+          <span className="db-banner__icon">
+            <FaUserPlus size={20} />
+          </span>
+          <div className="db-banner__body">
+            <div className="db-banner__title">
+              Want to save your scan history?
+            </div>
+            <p className="db-banner__text">
+              Create a free account to keep your scans, access them from any
+              device, and unlock more features.
+            </p>
           </div>
-          <h3
-            style={{
-              fontSize: "20px",
-              fontWeight: "700",
-              color: "#1e293b",
-              marginBottom: "8px",
-            }}
-          >
-            Want to save your scan history?
-          </h3>
-          <p
-            style={{
-              color: "#64748b",
-              maxWidth: "480px",
-              margin: "0 auto 20px",
-            }}
-          >
-            Create a free account to permanently save your scans, access them
-            from any device, and unlock premium features.
-          </p>
-          <button
-            onClick={() => setShowAuthModal(true)}
-            style={{
-              padding: "12px 32px",
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              color: "white",
-              border: "none",
-              borderRadius: "12px",
-              fontSize: "16px",
-              fontWeight: "600",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              boxShadow: "0 4px 15px rgba(102,126,234,0.4)",
-            }}
-          >
+          <button className="db-btn" onClick={() => setShowAuthModal(true)}>
             Sign Up Free
           </button>
         </div>
       )}
 
       {/* Recent Scans Table */}
-      <div className="chart-container">
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "20px",
-            flexWrap: "wrap",
-            gap: "12px",
-          }}
-        >
-          <div className="chart-title" style={{ marginBottom: 0 }}>
-            <FaClock style={{ color: "#667eea" }} />
-            <span>Recent Security Scans</span>
-            <span
-              style={{
-                fontSize: "14px",
-                fontWeight: "400",
-                color: "#94a3b8",
-                marginLeft: "8px",
-              }}
-            >
-              ({stats.recentScans?.length || 0} total)
-            </span>
-          </div>
+      <div className="db-card">
+        <div className="db-card__head">
+          <span className="db-card__icon">
+            <FaClock size={16} />
+          </span>
+          <span className="db-card__title">Recent Scans</span>
+          <span className="db-card__hint" style={{ marginLeft: 0 }}>
+            Latest {stats.recentScans?.length || 0}
+          </span>
           <button
+            className="db-btn db-btn--ghost"
+            style={{ marginLeft: "auto" }}
             onClick={() => navigate("/history")}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              padding: "10px 20px",
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              color: "white",
-              border: "none",
-              borderRadius: "12px",
-              fontSize: "14px",
-              fontWeight: "600",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-            }}
           >
-            <FaEye /> View All <FaChevronRight size={12} />
+            View all <FaChevronRight size={11} />
           </button>
         </div>
 
         {stats.recentScans?.length > 0 ? (
-          <div style={{ overflowX: "auto" }}>
-            <table className="table-premium">
+          <div className="db-table-wrap">
+            <table className="db-table">
               <thead>
                 <tr>
                   <th>Reference</th>
                   <th>Type</th>
                   <th>Content</th>
-                  <th>Prediction</th>
+                  <th>Result</th>
                   <th>Date</th>
                 </tr>
               </thead>
               <tbody>
-                {stats.recentScans?.slice(0, 5).map((scan, index) => {
-                  const getPredictionColor = (prediction) => {
-                    const pred = prediction?.toUpperCase() || "";
-                    switch (pred) {
-                      case "PHISHING":
-                        return { bg: "#fee2e2", color: "#dc2626" };
-                      case "SCAM":
-                        return { bg: "#fef3c7", color: "#d97706" };
-                      case "SUSPICIOUS":
-                        return { bg: "#fef3c7", color: "#d97706" };
-                      case "WARNING":
-                        return { bg: "#fef3c7", color: "#d97706" };
-                      case "SAFE":
-                        return { bg: "#d1fae5", color: "#065f46" };
-                      case "LEGITIMATE":
-                        return { bg: "#d1fae5", color: "#065f46" };
-                      default:
-                        return { bg: "#f1f5f9", color: "#64748b" };
-                    }
-                  };
-
-                  const getTypeBadge = (type) => {
-                    if (type === "url") {
-                      return {
-                        bg: "#dbeafe",
-                        color: "#1d4ed8",
-                        icon: <FaLink size={12} />,
-                        label: "URL",
-                      };
-                    } else if (type === "message") {
-                      return {
-                        bg: "#fce7f3",
-                        color: "#be185d",
-                        icon: <FaComment size={12} />,
-                        label: "Message",
-                      };
-                    }
-                    return {
-                      bg: "#f1f5f9",
-                      color: "#64748b",
-                      icon: null,
-                      label: "Unknown",
-                    };
-                  };
-
-                  const predColor = getPredictionColor(scan.prediction);
-                  const typeBadge = getTypeBadge(scan.type);
-                  const content = scan.content || "N/A";
-
+                {stats.recentScans.slice(0, 5).map((scan, index) => {
+                  const typeInfo = getTypeInfo(scan.type);
                   return (
-                    <tr key={index}>
-                      <td
-                        style={{
-                          fontFamily: "monospace",
-                          fontSize: "12px",
-                          color: "#667eea",
-                        }}
-                      >
-                        <span
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "4px",
-                          }}
-                        >
-                          <FaHashtag size={10} style={{ opacity: 0.5 }} />
-                          {scan.reference
-                            ? truncateText(scan.reference, 20)
-                            : "N/A"}
+                    <tr key={scan.reference || index}>
+                      <td className="db-ref">
+                        {scan.reference
+                          ? truncateText(scan.reference, 20)
+                          : "N/A"}
+                      </td>
+                      <td>
+                        <span className={`db-pill ${typeInfo.tone}`}>
+                          {typeInfo.icon}
+                          {typeInfo.label}
                         </span>
+                      </td>
+                      <td className="db-content" title={scan.content || ""}>
+                        {truncateText(scan.content || "N/A", 50)}
                       </td>
                       <td>
                         <span
-                          style={{
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: "6px",
-                            padding: "4px 12px",
-                            borderRadius: "20px",
-                            fontSize: "12px",
-                            fontWeight: "600",
-                            background: typeBadge.bg,
-                            color: typeBadge.color,
-                          }}
-                        >
-                          {typeBadge.icon}
-                          {typeBadge.label}
-                        </span>
-                      </td>
-                      <td
-                        style={{
-                          maxWidth: "200px",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {truncateText(content, 50)}
-                      </td>
-                      <td>
-                        <span
-                          style={{
-                            padding: "4px 12px",
-                            borderRadius: "20px",
-                            fontSize: "12px",
-                            fontWeight: "600",
-                            background: predColor.bg,
-                            color: predColor.color,
-                          }}
+                          className={`db-pill ${getPredictionTone(scan.prediction)}`}
                         >
                           {scan.prediction || "UNKNOWN"}
                         </span>
                       </td>
-                      <td style={{ color: "#64748b", fontSize: "14px" }}>
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "4px",
-                          }}
-                        >
-                          <FaCalendarAlt size={12} />
-                          {formatDate(
-                            scan.date || scan.scannedAt || Date.now(),
-                          )}
-                        </div>
+                      <td className="db-date">
+                        {formatDate(scan.date || scan.scannedAt || Date.now())}
                       </td>
                     </tr>
                   );
@@ -988,68 +815,13 @@ const Dashboard = () => {
             </table>
           </div>
         ) : (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "60px 20px",
-              textAlign: "center",
-            }}
-          >
-            <div
-              style={{
-                width: "80px",
-                height: "80px",
-                borderRadius: "50%",
-                background:
-                  "linear-gradient(135deg, #667eea15 0%, #764ba215 100%)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                marginBottom: "20px",
-              }}
-            >
-              <FaShieldAlt style={{ fontSize: "36px", color: "#94a3b8" }} />
-            </div>
-            <h3
-              style={{
-                fontSize: "18px",
-                fontWeight: "600",
-                color: "#1e293b",
-                marginBottom: "8px",
-              }}
-            >
-              No Scans Yet
-            </h3>
-            <p
-              style={{
-                fontSize: "14px",
-                color: "#94a3b8",
-                maxWidth: "400px",
-                marginBottom: "16px",
-              }}
-            >
-              Start scanning URLs or messages to see results here.
-            </p>
-            <button
-              onClick={() => navigate("/url-scan")}
-              style={{
-                padding: "10px 24px",
-                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                color: "white",
-                border: "none",
-                borderRadius: "12px",
-                fontSize: "14px",
-                fontWeight: "600",
-                cursor: "pointer",
-                transition: "all 0.3s ease",
-              }}
-            >
-              Start Scanning
-            </button>
-          </div>
+          <EmptyChartState
+            icon={FaShieldAlt}
+            title="No scans yet"
+            description="Start scanning URLs or messages to see results here."
+            actionText="Start Scanning"
+            onAction={() => navigate("/url-scan")}
+          />
         )}
       </div>
 
@@ -1082,6 +854,38 @@ const formatDate = (date) => {
     minute: "2-digit",
     hour12: true,
   });
+};
+
+const getPredictionTone = (prediction) => {
+  switch ((prediction || "").toUpperCase()) {
+    case "PHISHING":
+    case "DANGEROUS":
+    case "MALICIOUS":
+      return "db-pill--danger";
+    case "SCAM":
+    case "SUSPICIOUS":
+    case "WARNING":
+      return "db-pill--warn";
+    case "SAFE":
+    case "LEGITIMATE":
+      return "db-pill--safe";
+    default:
+      return "db-pill--neutral";
+  }
+};
+
+const getTypeInfo = (type) => {
+  if (type === "url") {
+    return { label: "URL", tone: "db-pill--url", icon: <FaLink size={11} /> };
+  }
+  if (type === "message") {
+    return {
+      label: "Message",
+      tone: "db-pill--msg",
+      icon: <FaComment size={11} />,
+    };
+  }
+  return { label: "Unknown", tone: "db-pill--neutral", icon: null };
 };
 
 const truncateText = (text, maxLength = 100) => {
