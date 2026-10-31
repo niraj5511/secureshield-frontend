@@ -39,6 +39,8 @@ import {
 } from "recharts";
 import toast from "react-hot-toast";
 import AuthModal from "../components/common/AuthModal";
+import { useTheme } from "../context/ThemeContext";
+import "../styles/dashboard.css";
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -54,6 +56,7 @@ const Dashboard = () => {
   const [refreshing, setRefreshing] = useState(false);
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
+  const { isDark } = useTheme();
   const { getStats: getGuestStats, scans: guestScans } = useGuest();
 
   useEffect(() => {
@@ -538,254 +541,66 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="dashboard-container">
-      <div className="animated-bg">
-        <div
-          className="circle"
-          style={{
-            width: "300px",
-            height: "300px",
-            top: "-150px",
-            left: "-150px",
-          }}
-        />
-        <div
-          className="circle"
-          style={{
-            width: "200px",
-            height: "200px",
-            bottom: "-100px",
-            right: "-100px",
-            animationDelay: "5s",
-          }}
-        />
-        <div
-          className="circle"
-          style={{
-            width: "150px",
-            height: "150px",
-            top: "50%",
-            left: "50%",
-            animationDelay: "10s",
-          }}
-        />
+    <div className={`dashboard-container ${isDark ? "db-dark" : ""}`}>
+      {/* Header */}
+      <div className="db-header">
+        <div>
+          <h1 className="db-title">
+            {isAuthenticated
+              ? `Welcome back, ${user?.firstName || "User"}`
+              : "Welcome to SecureShield"}
+          </h1>
+          <p className="db-subtitle">
+            {isAuthenticated
+              ? "Your security overview and recent scan activity."
+              : "Scan URLs and messages instantly. No account required."}
+          </p>
+          {!isAuthenticated && (
+            <div className="db-guest-pill">
+              <FaUserPlus size={12} />
+              <span>Guest mode. Sign up to save your scan history.</span>
+            </div>
+          )}
+        </div>
+        <button
+          className="db-refresh"
+          onClick={handleRefresh}
+          disabled={refreshing}
+        >
+          <FaSync className={refreshing ? "spinning" : ""} size={13} />
+          <span>{refreshing ? "Refreshing..." : "Refresh"}</span>
+        </button>
       </div>
 
-      {/* Welcome Section */}
-      <div className="welcome-section">
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: "16px",
-          }}
-        >
-          <div>
-            <h1 className="welcome-title">
-              {isAuthenticated
-                ? `Welcome back, ${user?.firstName || "User"}!`
-                : "Welcome to SecureShield"}
-            </h1>
-            <p className="welcome-subtitle">
-              {isAuthenticated
-                ? "Your AI-Powered Security Guardian • Real-time Protection Against Cyber Threats"
-                : "Start scanning URLs and messages instantly • No account required"}
-            </p>
-          </div>
-          <button
-            onClick={handleRefresh}
-            disabled={refreshing}
-            style={{
-              padding: "10px 20px",
-              background: "transparent",
-              border: "1px solid #e2e8f0",
-              borderRadius: "12px",
-              cursor: refreshing ? "not-allowed" : "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              color: "#64748b",
-              transition: "all 0.3s ease",
-              opacity: refreshing ? 0.6 : 1,
-            }}
-          >
-            <FaSync className={refreshing ? "spinning" : ""} size={14} />
-            <span>{refreshing ? "Refreshing..." : "Refresh"}</span>
-          </button>
-        </div>
-        {!isAuthenticated && (
-          <p
-            style={{
-              fontSize: "14px",
-              color: "#94a3b8",
-              marginTop: "8px",
-              background: "#f1f5f9",
-              padding: "8px 20px",
-              borderRadius: "100px",
-              display: "inline-block",
-            }}
-          >
-            👋 Guest mode • Sign up to save your scan history
-          </p>
-        )}
-      </div>
-
-      {/* Hero CTA Section */}
-      <div
-        style={{
-          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-          borderRadius: "24px",
-          padding: "40px 48px",
-          marginBottom: "48px",
-          position: "relative",
-          overflow: "hidden",
-          color: "white",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexWrap: "wrap",
-          gap: "20px",
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            top: "-80px",
-            right: "-80px",
-            width: "250px",
-            height: "250px",
-            borderRadius: "50%",
-            background: "rgba(255,255,255,0.05)",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            bottom: "-60px",
-            left: "-60px",
-            width: "180px",
-            height: "180px",
-            borderRadius: "50%",
-            background: "rgba(255,255,255,0.05)",
-          }}
-        />
-        <div style={{ position: "relative", zIndex: 1, flex: 1 }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              marginBottom: "12px",
-              flexWrap: "wrap",
-            }}
-          >
-            <span
-              style={{
-                background: "rgba(255,255,255,0.15)",
-                padding: "4px 14px",
-                borderRadius: "100px",
-                fontSize: "12px",
-                fontWeight: "600",
-                letterSpacing: "0.5px",
-              }}
-            >
-              🛡️ AI-POWERED THREAT DETECTION
+      {/* Hero CTA */}
+      <div className="db-hero">
+        <div className="db-hero__body">
+          <div className="db-hero__badges">
+            <span className="db-badge">
+              <FaShieldAlt size={11} />
+              AI-powered detection
             </span>
-            <span
-              style={{
-                background: "rgba(16, 185, 129, 0.25)",
-                padding: "4px 14px",
-                borderRadius: "100px",
-                fontSize: "12px",
-                fontWeight: "600",
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-              }}
-            >
-              <span
-                style={{
-                  display: "inline-block",
-                  width: "8px",
-                  height: "8px",
-                  background: "#10b981",
-                  borderRadius: "50%",
-                  animation: "pulse 2s infinite",
-                }}
-              />
-              {isAuthenticated ? "PROTECTED" : "GUEST MODE"}
+            <span className="db-badge db-badge--status">
+              <span className="db-badge__dot" />
+              {isAuthenticated ? "Protected" : "Guest mode"}
             </span>
           </div>
-          <h2
-            style={{
-              fontSize: "28px",
-              fontWeight: "700",
-              marginBottom: "8px",
-              lineHeight: "1.2",
-            }}
-          >
-            Check before you click or reply.
-          </h2>
-          <p
-            style={{
-              fontSize: "16px",
-              opacity: 0.9,
-              maxWidth: "480px",
-              lineHeight: "1.6",
-            }}
-          >
-            Scan suspicious URLs and messages in seconds with clear risk
-            explanations.
+          <h2 className="db-hero__title">Check before you click or reply.</h2>
+          <p className="db-hero__text">
+            Scan suspicious URLs and messages in seconds, with clear
+            explanations of why something is risky.
           </p>
         </div>
-        <div
-          style={{
-            position: "relative",
-            zIndex: 1,
-            display: "flex",
-            gap: "12px",
-            flexWrap: "wrap",
-          }}
-        >
+        <div className="db-hero__actions">
           <button
+            className="db-cta db-cta--primary"
             onClick={() => navigate("/url-scan")}
-            style={{
-              background: "white",
-              color: "#667eea",
-              padding: "14px 28px",
-              border: "none",
-              borderRadius: "12px",
-              fontSize: "16px",
-              fontWeight: "600",
-              cursor: "pointer",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "10px",
-              transition: "all 0.3s ease",
-              boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
-            }}
           >
             <FaLink /> Scan URL
           </button>
           <button
+            className="db-cta db-cta--ghost"
             onClick={() => navigate("/message-scan")}
-            style={{
-              background: "rgba(255,255,255,0.2)",
-              color: "white",
-              padding: "14px 28px",
-              border: "1px solid rgba(255,255,255,0.3)",
-              borderRadius: "12px",
-              fontSize: "16px",
-              fontWeight: "600",
-              cursor: "pointer",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "10px",
-              transition: "all 0.3s ease",
-              backdropFilter: "blur(10px)",
-            }}
           >
             <FaComment /> Scan Message
           </button>
